@@ -8,7 +8,6 @@ import (
 
 const dialogueURL = "https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=%s"
 
-
 type Dialogue struct {
 	APIKey string
 	*Settings
