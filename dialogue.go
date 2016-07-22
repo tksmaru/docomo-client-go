@@ -39,9 +39,14 @@ type DialogueResponse struct {
 }
 
 // Initialize new dialogue instance
-func NewDialogue(APIKey string, options ...Option) (*Dialogue, error) {
+func NewDialogue(apiKey string, options ...Option) (*Dialogue, error) {
+
+	if apiKey == "" {
+		return nil, fmt.Errorf("Invalid API key: %v", apiKey)
+	}
+
 	d := &Dialogue{
-		APIKey:   APIKey,
+		APIKey:   apiKey,
 		Settings: NewSettings(),
 	}
 
