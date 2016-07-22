@@ -1,10 +1,10 @@
 package docomo
 
 import (
-	"net/http"
-	"fmt"
-	"encoding/json"
 	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
 )
 
 const dialogueURL = "https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=%s"
@@ -14,18 +14,28 @@ type Dialogue struct {
 	Client *http.Client
 }
 
-
 type DialogueRequest struct {
-	Utt string `json:"utt"`
-	Context string `json:"context,omitempty"`
-	// TODO full params
+	Utt            string `json:"utt"`
+	Context        string `json:"context,omitempty"`
+	Nickname       string `json:"nickname,omitempty"`
+	NicknameYomi   string `json:"nickname_y,omitempty"`
+	Sex            string `json:"sex,omitempty"`
+	BloodType      string `json:"bloodtype,omitempty"`
+	BirthDateYear  int    `json:"birthdateY,string,omitempty"`
+	BirthDateMonth int    `json:"birthdateM,string,omitempty"`
+	BirthDateDay   int    `json:"birthdateD,string,omitempty"`
+	Age            int    `json:"age,string,omitempty"`
+	Constellations string `json:"constellations,string,omitempty"`
+	Place          string `json:"place,string,omitempty"`
+	Mode           string `json:"mode,string,omitempty"`
+	Character      int    `json:"type,string,omitempty"`
 }
 
 type DialogueResponse struct {
-	Utt string `json:"utt"`
-	Yomi string `json:"yomi"`
-	Mode string `json:"mode"`
-	Da string `json:"da"`
+	Utt     string `json:"utt"`
+	Yomi    string `json:"yomi"`
+	Mode    string `json:"mode"`
+	Da      string `json:"da"`
 	Context string `json:"context"`
 }
 
@@ -52,7 +62,7 @@ func (d *Dialogue) Request(req *DialogueRequest) (*DialogueResponse, error) {
 	defer response.Body.Close()
 
 	var res *DialogueResponse
-	if err :=json.NewDecoder(response.Body).Decode(&res); err != nil {
+	if err := json.NewDecoder(response.Body).Decode(&res); err != nil {
 		return nil, err
 	}
 

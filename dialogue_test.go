@@ -1,8 +1,8 @@
 package docomo
 
 import (
-	"testing"
 	"os"
+	"testing"
 )
 
 func TestTalk(t *testing.T) {
