@@ -9,7 +9,7 @@ import (
 
 const dialogueURL = "https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=%s"
 
-type Docomo struct {
+type Dialogue struct {
 	APIKey string
 	Client *http.Client
 }
@@ -29,15 +29,15 @@ type DialogueResponse struct {
 	Context string `json:"context"`
 }
 
-func NewDocomo(APIKey string) (*Docomo, error) {
-	d := &Docomo{
+func NewDialogue(APIKey string) (*Dialogue, error) {
+	d := &Dialogue{
 		APIKey: APIKey,
 		Client: http.DefaultClient,
 	}
 	return d, nil
 }
 
-func (d *Docomo) DialogueFull(req *DialogueRequest) (*DialogueResponse, error) {
+func (d *Dialogue) Request(req *DialogueRequest) (*DialogueResponse, error) {
 
 	b, err := json.Marshal(req)
 	if err != nil {
@@ -59,10 +59,10 @@ func (d *Docomo) DialogueFull(req *DialogueRequest) (*DialogueResponse, error) {
 	return res, nil
 }
 
-func (d *Docomo) Dialogue(phrase string) (*DialogueResponse, error) {
+func (d *Dialogue) Talk(phrase string) (*DialogueResponse, error) {
 
 	req := &DialogueRequest{
 		Utt: phrase,
 	}
-	return d.DialogueFull(req)
+	return d.Request(req)
 }

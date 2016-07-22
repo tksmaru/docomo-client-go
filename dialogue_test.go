@@ -5,15 +5,15 @@ import (
 	"os"
 )
 
-func TestDialogue(t *testing.T) {
+func TestTalk(t *testing.T) {
 
 	APIKey := os.Getenv("DOCOMO_API_KEY")
 
-	d, err := NewDocomo(APIKey)
+	d, err := NewDialogue(APIKey)
 	if err != nil {
 		t.Error(err)
 	}
-	r, err := d.Dialogue("今日の天気はどうですか？")
+	r, err := d.Talk("今日の天気はどうですか？")
 	if err != nil {
 		t.Error(err)
 	}
