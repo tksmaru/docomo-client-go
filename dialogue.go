@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 const dialogueURL = "https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=%s"
 
+
 type Dialogue struct {
 	APIKey string
-	Client *http.Client
+	*Settings
 }
 
 type DialogueRequest struct {
@@ -28,7 +28,7 @@ type DialogueRequest struct {
 	Constellations string `json:"constellations,string,omitempty"`
 	Place          string `json:"place,string,omitempty"`
 	Mode           string `json:"mode,string,omitempty"`
-	Character      int    `json:"type,string,omitempty"`
+	Type           int    `json:"type,string,omitempty"`
 }
 
 type DialogueResponse struct {
@@ -39,10 +39,17 @@ type DialogueResponse struct {
 	Context string `json:"context"`
 }
 
-func NewDialogue(APIKey string) (*Dialogue, error) {
+// Initialize new dialogue instance
+func NewDialogue(APIKey string, options ...Option) (*Dialogue, error) {
 	d := &Dialogue{
-		APIKey: APIKey,
-		Client: http.DefaultClient,
+		APIKey:   APIKey,
+		Settings: NewSettings(),
+	}
+
+	for _, option := range options {
+		if err := option(d.Settings); err != nil {
+			return nil, err
+		}
 	}
 	return d, nil
 }
@@ -55,7 +62,7 @@ func (d *Dialogue) Request(req *DialogueRequest) (*DialogueResponse, error) {
 	}
 	fmt.Printf("request: %s", string(b)) // TODO delete
 
-	response, err := d.Client.Post(fmt.Sprintf(dialogueURL, d.APIKey), "application/json", bytes.NewBuffer(b))
+	response, err := d.client.Post(fmt.Sprintf(dialogueURL, d.APIKey), "application/json", bytes.NewBuffer(b))
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +72,6 @@ func (d *Dialogue) Request(req *DialogueRequest) (*DialogueResponse, error) {
 	if err := json.NewDecoder(response.Body).Decode(&res); err != nil {
 		return nil, err
 	}
-
 	return res, nil
 }
 
