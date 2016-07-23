@@ -1,5 +1,8 @@
 # docomo-client-go
 
+[![CircleCI](https://circleci.com/gh/tksmaru/docomo-client-go.svg?style=svg&circle-token=584f14f264689884d04bd415118f82c725c5dcbc)](https://circleci.com/gh/tksmaru/docomo-client-go)
+[![Coverage Status](https://coveralls.io/repos/github/tksmaru/docomo-client-go/badge.svg?branch=feature_ci)](https://coveralls.io/github/tksmaru/docomo-client-go?branch=feature_ci)
+
 
 ## Usage
 
