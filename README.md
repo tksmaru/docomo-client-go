@@ -34,6 +34,6 @@ import docomo "github.com/tksmaru/docomo-client-go"
 Test code requires API key as an environment variables. Set your API key like below.
 
 ```sh
-export DOCOMO_API_KEY="xxxxxxxxxxxxxxxxxxxxx"
+export DOCOMO_DIALOGUE_API_KEY="xxxxxxxxxxxxxxxxxxxxx"
 ```
 
