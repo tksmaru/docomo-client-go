@@ -1,5 +1,8 @@
 # docomo-client-go
 
+[![CircleCI](https://circleci.com/gh/tksmaru/docomo-client-go.svg?style=svg&circle-token=584f14f264689884d04bd415118f82c725c5dcbc)](https://circleci.com/gh/tksmaru/docomo-client-go)
+[![Coverage Status](https://coveralls.io/repos/github/tksmaru/docomo-client-go/badge.svg?branch=feature_ci)](https://coveralls.io/github/tksmaru/docomo-client-go?branch=feature_ci)
+
 
 ## Usage
 
@@ -34,6 +37,6 @@ import docomo "github.com/tksmaru/docomo-client-go"
 Test code requires API key as an environment variables. Set your API key like below.
 
 ```sh
-export DOCOMO_API_KEY="xxxxxxxxxxxxxxxxxxxxx"
+export DOCOMO_DIALOGUE_API_KEY="xxxxxxxxxxxxxxxxxxxxx"
 ```
 

@@ -77,7 +77,7 @@ func TestNewDialogueWithInvalidHttpClient(t *testing.T) {
 
 func TestTalk(t *testing.T) {
 
-	apiKey := os.Getenv("DOCOMO_API_KEY")
+	apiKey := os.Getenv("DOCOMO_DIALOGUE_API_KEY")
 
 	d, err := NewDialogue(apiKey)
 	if err != nil {
