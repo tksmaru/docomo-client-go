@@ -42,18 +42,15 @@ type DialogueResponse struct {
 func NewDialogue(apiKey string, options ...Option) (*Dialogue, error) {
 
 	if apiKey == "" {
-		return nil, fmt.Errorf("Invalid API key: %v", apiKey)
+		return nil, errInvalidApiKey
 	}
 
 	d := &Dialogue{
 		APIKey:   apiKey,
 		Settings: NewSettings(),
 	}
-
-	for _, option := range options {
-		if err := option(d.Settings); err != nil {
-			return nil, err
-		}
+	if err := setOptions(d.Settings, options); err != nil {
+		return nil, err
 	}
 	return d, nil
 }

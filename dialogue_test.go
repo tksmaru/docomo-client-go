@@ -27,12 +27,14 @@ func TestNewDialogue(t *testing.T) {
 func TestNewDialogueWithInvalidAPIKey(t *testing.T) {
 
 	var apiKey string
-	keys := []string{apiKey, ""}
+	invalidKeys := []string{apiKey, ""}
 
-	for i, key := range keys {
+	for i, key := range invalidKeys {
 		d, err := NewDialogue(key)
-		if err != nil {
+		if err == errInvalidApiKey {
 			t.Logf("[%d] Expected error: %s", i, err.Error())
+		} else if err != nil {
+			t.Errorf("[%d] Expected %v, but got %v", i, errInvalidApiKey, err)
 		}
 		if d != nil {
 			t.Errorf("[%d] Expected nil but got %v", i, d)
@@ -63,12 +65,37 @@ func TestNewDialogueWithHttpClient(t *testing.T) {
 	}
 }
 
+func TestNewDialogueWithInvalidOptions(t *testing.T) {
+
+	invalidOptionsPattern := [][]Option{
+		{nil},
+		{nil, nil},
+		{WithHttpClient(&http.Client{}), nil},
+		{nil, WithHttpClient(&http.Client{})},
+	}
+	apiKey := "valid-key"
+
+	for _, invalidOptions := range invalidOptionsPattern{
+		d, err := NewDialogue(apiKey, invalidOptions...)
+		if err == errInvalidOption {
+			t.Logf("Expected error: %s", err.Error())
+		} else if err != nil {
+			t.Logf("Expected %v, but got %v", errInvalidOption, err)
+		}
+		if d != nil {
+			t.Errorf("Expected nil, but got %v", d)
+		}
+	}
+}
+
 func TestNewDialogueWithInvalidHttpClient(t *testing.T) {
 
 	apiKey := "valid-key"
 	d, err := NewDialogue(apiKey, WithHttpClient(nil))
-	if err != nil {
+	if err == errInvalidHttpClient {
 		t.Logf("Expected error: %s", err.Error())
+	} else if err != nil {
+		t.Logf("Expected %v, but got %v", errInvalidHttpClient, err)
 	}
 	if d != nil {
 		t.Errorf("Expected nil, but got %v", d)
