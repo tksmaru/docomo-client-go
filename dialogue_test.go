@@ -132,3 +132,18 @@ func TestTalkErrorWithInvalidApiKey(t *testing.T) {
 		t.Errorf("Expected %s, but got %s", expected, err.Error())
 	}
 }
+
+func TestRequestErrorWithInvalidRequest(t *testing.T) {
+
+	d, err := NewDialogue("__dummy__api__key__")
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := d.Request(nil)
+	if r != nil {
+		t.Errorf("Expected nil, but got %v", r)
+	}
+	if err != errInvalidDialogueRequest {
+		t.Errorf("Expected %v, but got %v", errInvalidDialogueRequest, err)
+	}
+}

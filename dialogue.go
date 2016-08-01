@@ -58,6 +58,9 @@ func NewDialogue(apiKey string, options ...Option) (*Dialogue, error) {
 
 func (d *Dialogue) Request(req *DialogueRequest) (*DialogueResponse, error) {
 
+	if req == nil {
+		return nil, errInvalidDialogueRequest
+	}
 	b, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
