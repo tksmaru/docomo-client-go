@@ -75,12 +75,12 @@ func TestNewDialogueWithInvalidOptions(t *testing.T) {
 	}
 	apiKey := "valid-key"
 
-	for _, invalidOptions := range invalidOptionsPattern{
+	for _, invalidOptions := range invalidOptionsPattern {
 		d, err := NewDialogue(apiKey, invalidOptions...)
 		if err == errInvalidOption {
 			t.Logf("Expected error: %s", err.Error())
 		} else if err != nil {
-			t.Logf("Expected %v, but got %v", errInvalidOption, err)
+			t.Errorf("Expected %v, but got %v", errInvalidOption, err)
 		}
 		if d != nil {
 			t.Errorf("Expected nil, but got %v", d)
@@ -95,7 +95,7 @@ func TestNewDialogueWithInvalidHttpClient(t *testing.T) {
 	if err == errInvalidHttpClient {
 		t.Logf("Expected error: %s", err.Error())
 	} else if err != nil {
-		t.Logf("Expected %v, but got %v", errInvalidHttpClient, err)
+		t.Errorf("Expected %v, but got %v", errInvalidHttpClient, err)
 	}
 	if d != nil {
 		t.Errorf("Expected nil, but got %v", d)
@@ -108,7 +108,7 @@ func TestTalk(t *testing.T) {
 
 	d, err := NewDialogue(apiKey)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	r, err := d.Talk("今日の天気はどうですか？")
 	if err != nil {
