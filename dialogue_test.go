@@ -112,7 +112,23 @@ func TestTalk(t *testing.T) {
 	}
 	r, err := d.Talk("今日の天気はどうですか？")
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
-	t.Logf("response: %v", r)
+	t.Logf("success response: %v", r)
+}
+
+func TestTalkErrorWithInvalidApiKey(t *testing.T) {
+
+	d, err := NewDialogue("__invalid__api__key__")
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := d.Talk("今日の天気はどうですか？")
+	if r != nil {
+		t.Errorf("Expected nil, but got %v", r)
+	}
+	expected := "POLSLA009: Unable to perform ApiKey based Authentication"
+	if err.Error() != expected {
+		t.Errorf("Expected %s, but got %s", expected, err.Error())
+	}
 }

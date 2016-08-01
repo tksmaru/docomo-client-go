@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
 )
 
 const dialogueURL = "https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=%s"
@@ -61,7 +62,6 @@ func (d *Dialogue) Request(req *DialogueRequest) (*DialogueResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("request: %s", string(b)) // TODO delete
 
 	response, err := d.client.Post(fmt.Sprintf(dialogueURL, d.APIKey), "application/json", bytes.NewBuffer(b))
 	if err != nil {
@@ -69,11 +69,20 @@ func (d *Dialogue) Request(req *DialogueRequest) (*DialogueResponse, error) {
 	}
 	defer response.Body.Close()
 
-	var res *DialogueResponse
-	if err := json.NewDecoder(response.Body).Decode(&res); err != nil {
-		return nil, err
+	if response.StatusCode == http.StatusOK {
+		var res *DialogueResponse
+		if err := json.NewDecoder(response.Body).Decode(&res); err != nil {
+			return nil, err
+		}
+		return res, nil
+	} else {
+		var errorRes *CommonError
+		if err := json.NewDecoder(response.Body).Decode(&errorRes); err != nil {
+			return nil, err
+		}
+		e := errorRes.RequestError.PolicyException
+		return nil, fmt.Errorf("%s: %s", e.MessageId, e.Text)
 	}
-	return res, nil
 }
 
 func (d *Dialogue) Talk(phrase string) (*DialogueResponse, error) {
