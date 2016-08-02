@@ -12,4 +12,3 @@ type RequestError struct {
 type CommonError struct {
 	RequestError RequestError `json:"requestError"`
 }
-

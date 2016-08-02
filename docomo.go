@@ -10,7 +10,6 @@ var errInvalidOption = errors.New("Invalid option.")
 var errInvalidHttpClient = errors.New("Invalid http client.")
 var errInvalidDialogueRequest = errors.New("Invalid dialogue request.")
 
-
 type Settings struct {
 	client *http.Client
 }
