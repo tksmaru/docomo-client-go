@@ -75,12 +75,12 @@ func TestNewDialogueWithInvalidOptions(t *testing.T) {
 	}
 	apiKey := "valid-key"
 
-	for _, invalidOptions := range invalidOptionsPattern{
+	for _, invalidOptions := range invalidOptionsPattern {
 		d, err := NewDialogue(apiKey, invalidOptions...)
 		if err == errInvalidOption {
 			t.Logf("Expected error: %s", err.Error())
 		} else if err != nil {
-			t.Logf("Expected %v, but got %v", errInvalidOption, err)
+			t.Errorf("Expected %v, but got %v", errInvalidOption, err)
 		}
 		if d != nil {
 			t.Errorf("Expected nil, but got %v", d)
@@ -95,7 +95,7 @@ func TestNewDialogueWithInvalidHttpClient(t *testing.T) {
 	if err == errInvalidHttpClient {
 		t.Logf("Expected error: %s", err.Error())
 	} else if err != nil {
-		t.Logf("Expected %v, but got %v", errInvalidHttpClient, err)
+		t.Errorf("Expected %v, but got %v", errInvalidHttpClient, err)
 	}
 	if d != nil {
 		t.Errorf("Expected nil, but got %v", d)
@@ -108,11 +108,42 @@ func TestTalk(t *testing.T) {
 
 	d, err := NewDialogue(apiKey)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	r, err := d.Talk("今日の天気はどうですか？")
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
-	t.Logf("response: %v", r)
+	t.Logf("success response: %v", r)
+}
+
+func TestTalkErrorWithInvalidApiKey(t *testing.T) {
+
+	d, err := NewDialogue("__invalid__api__key__")
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := d.Talk("今日の天気はどうですか？")
+	if r != nil {
+		t.Errorf("Expected nil, but got %v", r)
+	}
+	expected := "POLSLA009: Unable to perform ApiKey based Authentication"
+	if err.Error() != expected {
+		t.Errorf("Expected %s, but got %s", expected, err.Error())
+	}
+}
+
+func TestRequestErrorWithInvalidRequest(t *testing.T) {
+
+	d, err := NewDialogue("__dummy__api__key__")
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := d.Request(nil)
+	if r != nil {
+		t.Errorf("Expected nil, but got %v", r)
+	}
+	if err != errInvalidDialogueRequest {
+		t.Errorf("Expected %v, but got %v", errInvalidDialogueRequest, err)
+	}
 }
