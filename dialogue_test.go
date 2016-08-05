@@ -143,7 +143,7 @@ func TestRequestErrorWithInvalidRequest(t *testing.T) {
 	if r != nil {
 		t.Errorf("Expected nil, but got %v", r)
 	}
-	if err != errInvalidDialogueRequest {
-		t.Errorf("Expected %v, but got %v", errInvalidDialogueRequest, err)
+	if err != errInvalidRequest {
+		t.Errorf("Expected %v, but got %v", errInvalidRequest, err)
 	}
 }

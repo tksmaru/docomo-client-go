@@ -57,6 +57,10 @@ func newNamedEntity(apiKey string, endpoint string, options []Option) (*NamedEnt
 
 func (n *NamedEntity) Request(req *NamedEntityRequest) (*NamedEntityResponse, error) {
 
+	if req == nil {
+		return nil, errInvalidRequest
+	}
+
 	b, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
