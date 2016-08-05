@@ -7,11 +7,12 @@ import (
 	"net/http"
 )
 
-const dialogueURL = "https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=%s"
+const dialogueEndpoint = "https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=%s"
 
 type Dialogue struct {
 	APIKey string
 	*Settings
+	Endpoint string
 }
 
 type DialogueRequest struct {
@@ -42,13 +43,14 @@ type DialogueResponse struct {
 // Initialize new dialogue instance
 func NewDialogue(apiKey string, options ...Option) (*Dialogue, error) {
 
-	if apiKey == "" {
+	if !isValidKey(apiKey) {
 		return nil, errInvalidApiKey
 	}
 
 	d := &Dialogue{
 		APIKey:   apiKey,
 		Settings: NewSettings(),
+		Endpoint: dialogueEndpoint,
 	}
 	if err := setOptions(d.Settings, options); err != nil {
 		return nil, err
@@ -59,14 +61,14 @@ func NewDialogue(apiKey string, options ...Option) (*Dialogue, error) {
 func (d *Dialogue) Request(req *DialogueRequest) (*DialogueResponse, error) {
 
 	if req == nil {
-		return nil, errInvalidDialogueRequest
+		return nil, errInvalidRequest
 	}
 	b, err := json.Marshal(req)
 	if err != nil {
 		return nil, err
 	}
 
-	response, err := d.client.Post(fmt.Sprintf(dialogueURL, d.APIKey), "application/json", bytes.NewBuffer(b))
+	response, err := d.client.Post(fmt.Sprintf(d.Endpoint, d.APIKey), "application/json", bytes.NewBuffer(b))
 	if err != nil {
 		return nil, err
 	}

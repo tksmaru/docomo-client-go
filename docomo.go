@@ -8,8 +8,7 @@ import (
 var errInvalidApiKey = errors.New("Invalid API key.")
 var errInvalidOption = errors.New("Invalid option.")
 var errInvalidHttpClient = errors.New("Invalid http client.")
-var errInvalidDialogueRequest = errors.New("Invalid dialogue request.")
-
+var errInvalidRequest = errors.New("Invalid request object.")
 
 type Settings struct {
 	client *http.Client
@@ -46,4 +45,12 @@ func WithHttpClient(client *http.Client) Option {
 		s.client = client
 		return nil
 	}
+}
+
+// Validate Keys. This validation checks for nil or empty string.
+func isValidKey(apiKey string) bool {
+	if apiKey == "" {
+		return false
+	}
+	return true
 }
