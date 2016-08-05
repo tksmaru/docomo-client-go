@@ -6,6 +6,6 @@ test:
     - go get github.com/mattn/goveralls
     - go get golang.org/x/tools/cmd/cover
   override:
-    - go test -cover -v -race -covermode=atomic -coverprofile=$HOME/coverage.out
+    - make test
   post:
     - goveralls -coverprofile=$HOME/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
