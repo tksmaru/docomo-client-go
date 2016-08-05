@@ -8,4 +8,4 @@ test:
   override:
     - make test
   post:
-    - goveralls -coverprofile=$HOME/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
+    - goveralls -coverprofile=$HOME/$CIRCLE_PROJECT_REPONAME/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
