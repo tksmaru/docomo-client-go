@@ -42,7 +42,7 @@ type DialogueResponse struct {
 // Initialize new dialogue instance
 func NewDialogue(apiKey string, options ...Option) (*Dialogue, error) {
 
-	if apiKey == "" {
+	if !isValidKey(apiKey) {
 		return nil, errInvalidApiKey
 	}
 

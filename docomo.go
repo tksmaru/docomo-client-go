@@ -46,3 +46,11 @@ func WithHttpClient(client *http.Client) Option {
 		return nil
 	}
 }
+
+// Validate Keys. This validation checks for nil or empty string.
+func isValidKey(apiKey string) bool {
+	if apiKey == "" {
+		return false
+	}
+	return true
+}
