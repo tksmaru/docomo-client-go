@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	NamedEntityRequestUrlForCorp       = "https://api.apigw.smt.docomo.ne.jp/gooLanguageAnalysisCorp/v1/entity?APIKEY=%s"
-	NamedEntityRequestUrlForIndividual = "https://api.apigw.smt.docomo.ne.jp/gooLanguageAnalysis/v1/entity?APIKEY=%s"
+	namedEntityEndpointForCorp = "https://api.apigw.smt.docomo.ne.jp/gooLanguageAnalysisCorp/v1/entity?APIKEY=%s"
+	namedEntityEndpointForIndividual = "https://api.apigw.smt.docomo.ne.jp/gooLanguageAnalysis/v1/entity?APIKEY=%s"
 )
 
 type NamedEntityRequest struct {
@@ -31,23 +31,23 @@ type NamedEntity struct {
 }
 
 // for individual users
-func NewNamedEntityForIndividual(APIKey string, options ...Option) (*NamedEntity, error) {
-	return newNamedEntity(APIKey, NamedEntityRequestUrlForIndividual, options)
+func NewNamedEntityForIndividual(apiKey string, options ...Option) (*NamedEntity, error) {
+	return newNamedEntity(apiKey, namedEntityEndpointForIndividual, options)
 }
 
 // for corporation users
-func NewNamedEntityForCorp(APIKey string, options ...Option) (*NamedEntity, error) {
-	return newNamedEntity(APIKey, NamedEntityRequestUrlForCorp, options)
+func NewNamedEntityForCorp(apiKey string, options ...Option) (*NamedEntity, error) {
+	return newNamedEntity(apiKey, namedEntityEndpointForCorp, options)
 }
 
-func newNamedEntity(APIKey string, Endpoint string, options []Option) (*NamedEntity, error) {
-	if !isValidKey(APIKey) {
+func newNamedEntity(apiKey string, endpoint string, options []Option) (*NamedEntity, error) {
+	if !isValidKey(apiKey) {
 		return nil, errInvalidApiKey
 	}
 	n := &NamedEntity{
-		APIKey:   APIKey,
+		APIKey:   apiKey,
 		Settings: NewSettings(),
-		Endpoint: Endpoint,
+		Endpoint: endpoint,
 	}
 	if err := setOptions(n.Settings, options); err != nil {
 		return nil, err
