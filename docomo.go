@@ -16,9 +16,10 @@ var errInvalidRequest = errors.New("Invalid request object.")
 const apiDomain = "https://api.apigw.smt.docomo.ne.jp"
 
 type Client struct {
-	APIKey   string
-	settings *Settings
-	Dialogue *Dialogue
+	APIKey      string
+	settings    *Settings
+	Dialogue    *Dialogue
+	NamedEntity *NamedEntity
 }
 
 func NewClient(apiKey string, options ...Option) (*Client, error) {
@@ -36,6 +37,7 @@ func NewClient(apiKey string, options ...Option) (*Client, error) {
 	}
 
 	c.Dialogue = newDialogue(c)
+	c.NamedEntity = newNamedEntity(c)
 
 	return c, nil
 }
