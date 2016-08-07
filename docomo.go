@@ -10,10 +10,10 @@ import (
 const apiDomain = "https://api.apigw.smt.docomo.ne.jp"
 
 type Client struct {
-	APIKey                string
-	settings              *Settings
-	Dialogue              *Dialogue
-	NamedEntity           *NamedEntity
+	APIKey        string
+	settings      *Settings
+	Dialogue      *Dialogue
+	NamedEntity   *NamedEntity
 	Morphological *Morphological
 }
 
