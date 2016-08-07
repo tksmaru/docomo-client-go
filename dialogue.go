@@ -7,11 +7,13 @@ import (
 	"net/http"
 )
 
-const dialogueEndpoint = "https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=%s"
+//const dialogueEndpoint = "https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=%s"
+const dialogueEndpoint = "/dialogue/v1/dialogue"
 
 type Dialogue struct {
-	APIKey string
-	*Settings
+	//APIKey string
+	//*Settings
+	*Client
 	Endpoint string
 }
 
@@ -41,21 +43,23 @@ type DialogueResponse struct {
 }
 
 // Initialize new dialogue instance
-func NewDialogue(apiKey string, options ...Option) (*Dialogue, error) {
+func newDialogue( /*apiKey string, options ...Option*/ client *Client) *Dialogue /*, error*/ {
 
-	if !isValidKey(apiKey) {
-		return nil, errInvalidApiKey
-	}
+	//if !isValidKey(apiKey) {
+	//	return nil, errInvalidApiKey
+	//}
 
 	d := &Dialogue{
-		APIKey:   apiKey,
-		Settings: NewSettings(),
-		Endpoint: dialogueEndpoint,
+		//APIKey:   apiKey,
+		//Settings: NewSettings(),
+		client:   client,
+		Endpoint: fmt.Sprintf("%s%s?APIKEY=%s", apiDomain, dialogueEndpoint, client.APIKey),
 	}
-	if err := setOptions(d.Settings, options); err != nil {
-		return nil, err
-	}
-	return d, nil
+	//if err := setOptions(d.Settings, options); err != nil {
+	//	return nil, err
+	//}
+	//return d, nil
+	return d
 }
 
 func (d *Dialogue) Request(req *DialogueRequest) (*DialogueResponse, error) {
@@ -68,7 +72,7 @@ func (d *Dialogue) Request(req *DialogueRequest) (*DialogueResponse, error) {
 		return nil, err
 	}
 
-	response, err := d.client.Post(fmt.Sprintf(d.Endpoint, d.APIKey), "application/json", bytes.NewBuffer(b))
+	response, err := d.post(d.Endpoint, "application/json", bytes.NewBuffer(b))
 	if err != nil {
 		return nil, err
 	}

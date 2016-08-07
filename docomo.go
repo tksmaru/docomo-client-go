@@ -2,6 +2,7 @@ package docomo
 
 import (
 	"errors"
+	"io"
 	"net/http"
 )
 
@@ -10,13 +11,44 @@ var errInvalidOption = errors.New("Invalid option.")
 var errInvalidHttpClient = errors.New("Invalid http client.")
 var errInvalidRequest = errors.New("Invalid request object.")
 
-type Settings struct {
-	client *http.Client
+const apiDomain = "https://api.apigw.smt.docomo.ne.jp"
+
+type Client struct {
+	APIKey   string
+	settings *Settings
+	Dialogue *Dialogue
 }
 
+func NewClient(apiKey string, options ...Option) (*Client, error) {
+
+	if !isValidKey(apiKey) {
+		return nil, errInvalidApiKey
+	}
+
+	c := &Client{
+		APIKey:   apiKey,
+		settings: NewSettings(),
+		//Dialogue: NewDialogue(),
+	}
+	if err := setOptions(c.settings, options); err != nil {
+		return nil, err
+	}
+
+	c.Dialogue = newDialogue(c)
+
+	return c, nil
+}
+
+type Settings struct {
+	client *http.Client
+	isCorp bool
+}
+
+// Default Settings for client.
 func NewSettings() *Settings {
 	return &Settings{
 		client: http.DefaultClient,
+		isCorp: false,
 	}
 }
 
@@ -47,10 +79,22 @@ func WithHttpClient(client *http.Client) Option {
 	}
 }
 
+// use as a corporation account
+func AsCorp() Option {
+	return func(s *Settings) error {
+		s.isCorp = true
+		return nil
+	}
+}
+
 // Validate Keys. This validation checks for nil or empty string.
 func isValidKey(apiKey string) bool {
 	if apiKey == "" {
 		return false
 	}
 	return true
+}
+
+func (c *Client) post(url string, bodyType string, body io.Reader) (*http.Response, error) {
+	return c.settings.client.Post(url, bodyType, body)
 }
