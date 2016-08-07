@@ -12,23 +12,68 @@ import docomo "github.com/tksmaru/docomo-client-go"
 ```
 
 ### Dialogue
-
 ```go
-
     apiKey := "your API key value"
-    d, err := docomo.NewDialogue(apiKey)
+    c, err := docomo.NewClient(apiKey)
     if err != nil {
         fmt.Printf(err)
         return
     }
-    r, err := d.Talk("今日の天気はどうですか？")
+    r, err := c.Dialogue.Talk("今日の天気はどうですか？")
     if err != nil {
         fmt.Printf(err)
         return
     }
     fmt.Printf("response: %s", r.Utt)
-
 ```
+
+### NamedEntity (As Individual user)
+```go
+    apiKey := "your API key value"
+    c, err := docomo.NewClient(apiKey)
+    if err != nil {
+        fmt.Printf(err)
+        return
+    }
+    r, err := c.NamedEntity.Extract("今日の5時の千葉の天気を千葉県庁の佐藤さんが確認した")
+    if err != nil {
+        fmt.Printf(err)
+        return
+    }
+    fmt.Printf("response: %v", r)
+```
+
+### Morphological Analysis
+```go
+    apiKey := "your API key value"
+    c, err := docomo.NewClient(apiKey)
+    if err != nil {
+        fmt.Printf(err)
+        return
+    }
+    r, err := c.Morphological.Analyze("今日の5時の千葉の天気を千葉県庁の佐藤さんが確認した")
+    if err != nil {
+        fmt.Printf(err)
+        return
+    }
+    fmt.Printf("response: %v", r)
+```
+
+### Configure http client
+If you want to configure http client, initialize client like below.
+```go
+    apiKey := "your API key value"
+    hc := &http.Client{}
+    c, err := docomo.NewClient(apiKey, docomo.WithHttpClient(hc))
+```
+
+### Configure as corporation user
+If you want to use API's for corporation account (ex: Named Entity), initialize client like below.
+```go
+    apiKey := "your API key value"
+    c, err := docomo.NewClient(apiKey, docomo.AsCorp())
+```
+
 
 ## Contribution
 

@@ -1,17 +1,13 @@
 package docomo
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
-const dialogueEndpoint = "https://api.apigw.smt.docomo.ne.jp/dialogue/v1/dialogue?APIKEY=%s"
+const dialogueEndpoint = "/dialogue/v1/dialogue"
 
 type Dialogue struct {
-	APIKey string
-	*Settings
+	client   *Client
 	Endpoint string
 }
 
@@ -41,53 +37,25 @@ type DialogueResponse struct {
 }
 
 // Initialize new dialogue instance
-func NewDialogue(apiKey string, options ...Option) (*Dialogue, error) {
-
-	if !isValidKey(apiKey) {
-		return nil, errInvalidApiKey
-	}
+func newDialogue(c *Client) *Dialogue {
 
 	d := &Dialogue{
-		APIKey:   apiKey,
-		Settings: NewSettings(),
-		Endpoint: dialogueEndpoint,
+		client:   c,
+		Endpoint: fmt.Sprintf("%s%s?APIKEY=%s", apiDomain, dialogueEndpoint, c.APIKey),
 	}
-	if err := setOptions(d.Settings, options); err != nil {
-		return nil, err
-	}
-	return d, nil
+	return d
 }
 
-func (d *Dialogue) Request(req *DialogueRequest) (*DialogueResponse, error) {
+func (d *Dialogue) Post(req *DialogueRequest) (*DialogueResponse, error) {
 
 	if req == nil {
 		return nil, errInvalidRequest
 	}
-	b, err := json.Marshal(req)
-	if err != nil {
+	var res *DialogueResponse
+	if err := d.client.post(d.Endpoint, "application/json", req, &res); err != nil {
 		return nil, err
 	}
-
-	response, err := d.client.Post(fmt.Sprintf(d.Endpoint, d.APIKey), "application/json", bytes.NewBuffer(b))
-	if err != nil {
-		return nil, err
-	}
-	defer response.Body.Close()
-
-	if response.StatusCode == http.StatusOK {
-		var res *DialogueResponse
-		if err := json.NewDecoder(response.Body).Decode(&res); err != nil {
-			return nil, err
-		}
-		return res, nil
-	} else {
-		var errorRes *CommonError
-		if err := json.NewDecoder(response.Body).Decode(&errorRes); err != nil {
-			return nil, err
-		}
-		e := errorRes.RequestError.PolicyException
-		return nil, fmt.Errorf("%s: %s", e.MessageId, e.Text)
-	}
+	return res, nil
 }
 
 func (d *Dialogue) Talk(phrase string) (*DialogueResponse, error) {
@@ -95,5 +63,5 @@ func (d *Dialogue) Talk(phrase string) (*DialogueResponse, error) {
 	req := &DialogueRequest{
 		Utt: phrase,
 	}
-	return d.Request(req)
+	return d.Post(req)
 }

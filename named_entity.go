@@ -1,15 +1,12 @@
 package docomo
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"net/http"
 )
 
 const (
-	namedEntityEndpointForCorp = "https://api.apigw.smt.docomo.ne.jp/gooLanguageAnalysisCorp/v1/entity?APIKEY=%s"
-	namedEntityEndpointForIndividual = "https://api.apigw.smt.docomo.ne.jp/gooLanguageAnalysis/v1/entity?APIKEY=%s"
+	namedEntityEndpointForCorp       = "/gooLanguageAnalysisCorp/v1/entity"
+	namedEntityEndpointForIndividual = "/gooLanguageAnalysis/v1/entity"
 )
 
 type NamedEntityRequest struct {
@@ -19,73 +16,38 @@ type NamedEntityRequest struct {
 }
 
 type NamedEntityResponse struct {
-	request_id  string     `json:"request_id`
+	RequestId   string     `json:"request_id"`
 	ClassFilter string     `json:"class_filter,omitempty"`
 	NeList      [][]string `json:"ne_list"`
 }
 
 type NamedEntity struct {
-	APIKey string
-	*Settings
+	client   *Client
 	Endpoint string
 }
 
-// for individual users
-func NewNamedEntityForIndividual(apiKey string, options ...Option) (*NamedEntity, error) {
-	return newNamedEntity(apiKey, namedEntityEndpointForIndividual, options)
-}
-
-// for corporation users
-func NewNamedEntityForCorp(apiKey string, options ...Option) (*NamedEntity, error) {
-	return newNamedEntity(apiKey, namedEntityEndpointForCorp, options)
-}
-
-func newNamedEntity(apiKey string, endpoint string, options []Option) (*NamedEntity, error) {
-	if !isValidKey(apiKey) {
-		return nil, errInvalidApiKey
-	}
+func newNamedEntity(c *Client) *NamedEntity {
 	n := &NamedEntity{
-		APIKey:   apiKey,
-		Settings: NewSettings(),
-		Endpoint: endpoint,
+		client: c,
 	}
-	if err := setOptions(n.Settings, options); err != nil {
-		return nil, err
+	if c.settings.asCorp {
+		n.Endpoint = fmt.Sprintf("%s%s?APIKEY=%s", apiDomain, namedEntityEndpointForCorp, c.APIKey)
+	} else {
+		n.Endpoint = fmt.Sprintf("%s%s?APIKEY=%s", apiDomain, namedEntityEndpointForIndividual, c.APIKey)
 	}
-	return n, nil
+	return n
 }
 
-func (n *NamedEntity) Request(req *NamedEntityRequest) (*NamedEntityResponse, error) {
+func (n *NamedEntity) Post(req *NamedEntityRequest) (*NamedEntityResponse, error) {
 
 	if req == nil {
 		return nil, errInvalidRequest
 	}
-
-	b, err := json.Marshal(req)
-	if err != nil {
+	var res *NamedEntityResponse
+	if err := n.client.post(n.Endpoint, "application/json", req, &res); err != nil {
 		return nil, err
 	}
-
-	response, err := n.client.Post(fmt.Sprintf(n.Endpoint, n.APIKey), "application/json", bytes.NewBuffer(b))
-	if err != nil {
-		return nil, err
-	}
-	defer response.Body.Close()
-
-	if response.StatusCode == http.StatusOK {
-		var res *NamedEntityResponse
-		if err := json.NewDecoder(response.Body).Decode(&res); err != nil {
-			return nil, err
-		}
-		return res, nil
-	} else {
-		var errorRes *CommonError
-		if err := json.NewDecoder(response.Body).Decode(&errorRes); err != nil {
-			return nil, err
-		}
-		e := errorRes.RequestError.PolicyException
-		return nil, fmt.Errorf("%s: %s", e.MessageId, e.Text)
-	}
+	return res, nil
 }
 
 func (n *NamedEntity) Extract(sentence string) (*NamedEntityResponse, error) {
@@ -93,5 +55,5 @@ func (n *NamedEntity) Extract(sentence string) (*NamedEntityResponse, error) {
 	req := &NamedEntityRequest{
 		Sentence: sentence,
 	}
-	return n.Request(req)
+	return n.Post(req)
 }
