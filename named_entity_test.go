@@ -1,10 +1,10 @@
 package docomo
 
 import (
-	"os"
-	"testing"
-	"reflect"
 	"net/http"
+	"os"
+	"reflect"
+	"testing"
 	"time"
 )
 

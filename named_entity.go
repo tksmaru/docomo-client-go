@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	namedEntityEndpointForCorp = "https://api.apigw.smt.docomo.ne.jp/gooLanguageAnalysisCorp/v1/entity?APIKEY=%s"
+	namedEntityEndpointForCorp       = "https://api.apigw.smt.docomo.ne.jp/gooLanguageAnalysisCorp/v1/entity?APIKEY=%s"
 	namedEntityEndpointForIndividual = "https://api.apigw.smt.docomo.ne.jp/gooLanguageAnalysis/v1/entity?APIKEY=%s"
 )
 
