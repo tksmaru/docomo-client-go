@@ -51,7 +51,6 @@ func TestNamedEntity_Post_ErrorWithInvalidArgs(t *testing.T) {
 	if err != errInvalidRequest {
 		t.Errorf("Expected %s, but got %s", errInvalidRequest, err.Error())
 	}
-
 }
 
 func TestNamedEntity_Post_ErrorWithInvalidApiKey(t *testing.T) {

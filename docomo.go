@@ -1,25 +1,20 @@
 package docomo
 
 import (
+	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
 	"net/http"
 )
-
-var errInvalidApiKey = errors.New("Invalid API key.")
-var errInvalidOption = errors.New("Invalid option.")
-var errInvalidHttpClient = errors.New("Invalid http client.")
-var errInvalidRequest = errors.New("Invalid request object.")
 
 const apiDomain = "https://api.apigw.smt.docomo.ne.jp"
 
 type Client struct {
-	APIKey      string
-	settings    *Settings
-	Dialogue    *Dialogue
-	NamedEntity *NamedEntity
+	APIKey                string
+	settings              *Settings
+	Dialogue              *Dialogue
+	NamedEntity           *NamedEntity
+	Morphological *Morphological
 }
 
 func NewClient(apiKey string, options ...Option) (*Client, error) {
@@ -38,6 +33,7 @@ func NewClient(apiKey string, options ...Option) (*Client, error) {
 
 	c.Dialogue = newDialogue(c)
 	c.NamedEntity = newNamedEntity(c)
+	c.Morphological = newMorphological(c)
 
 	return c, nil
 }
@@ -98,16 +94,20 @@ func isValidKey(apiKey string) bool {
 	return true
 }
 
-func (c *Client) post(url string, bodyType string, body io.Reader, v interface{}) error {
+func (c *Client) post(url string, bodyType string, req interface{}, res interface{}) error {
 
-	resp, err := c.settings.client.Post(url, bodyType, body)
+	b, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+	resp, err := c.settings.client.Post(url, bodyType, bytes.NewBuffer(b))
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
-		if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
+		if err := json.NewDecoder(resp.Body).Decode(res); err != nil {
 			return err
 		}
 		return nil

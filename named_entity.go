@@ -1,8 +1,6 @@
 package docomo
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 )
 
@@ -45,14 +43,8 @@ func (n *NamedEntity) Post(req *NamedEntityRequest) (*NamedEntityResponse, error
 	if req == nil {
 		return nil, errInvalidRequest
 	}
-
-	b, err := json.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-
 	var res *NamedEntityResponse
-	if err := n.client.post(n.Endpoint, "application/json", bytes.NewBuffer(b), &res); err != nil {
+	if err := n.client.post(n.Endpoint, "application/json", req, &res); err != nil {
 		return nil, err
 	}
 	return res, nil

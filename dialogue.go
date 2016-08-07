@@ -1,8 +1,6 @@
 package docomo
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 )
 
@@ -53,13 +51,8 @@ func (d *Dialogue) Post(req *DialogueRequest) (*DialogueResponse, error) {
 	if req == nil {
 		return nil, errInvalidRequest
 	}
-	b, err := json.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-
 	var res *DialogueResponse
-	if err := d.client.post(d.Endpoint, "application/json", bytes.NewBuffer(b), &res); err != nil {
+	if err := d.client.post(d.Endpoint, "application/json", req, &res); err != nil {
 		return nil, err
 	}
 	return res, nil

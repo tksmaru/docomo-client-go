@@ -43,6 +43,22 @@ import docomo "github.com/tksmaru/docomo-client-go"
     fmt.Printf("response: %v", r)
 ```
 
+### Morphological Analysis
+```go
+    apiKey := "your API key value"
+    c, err := docomo.NewClient(apiKey)
+    if err != nil {
+        fmt.Printf(err)
+        return
+    }
+    r, err := c.Morphological.Analyze("今日の5時の千葉の天気を千葉県庁の佐藤さんが確認した")
+    if err != nil {
+        fmt.Printf(err)
+        return
+    }
+    fmt.Printf("response: %v", r)
+```
+
 ### Configure http client
 If you want to configure http client, initialize client like below.
 ```go
