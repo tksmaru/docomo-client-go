@@ -1,7 +1,9 @@
 package docomo
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -28,7 +30,6 @@ func NewClient(apiKey string, options ...Option) (*Client, error) {
 	c := &Client{
 		APIKey:   apiKey,
 		settings: NewSettings(),
-		//Dialogue: NewDialogue(),
 	}
 	if err := setOptions(c.settings, options); err != nil {
 		return nil, err
@@ -41,14 +42,14 @@ func NewClient(apiKey string, options ...Option) (*Client, error) {
 
 type Settings struct {
 	client *http.Client
-	isCorp bool
+	asCorp bool
 }
 
 // Default Settings for client.
 func NewSettings() *Settings {
 	return &Settings{
 		client: http.DefaultClient,
-		isCorp: false,
+		asCorp: false,
 	}
 }
 
@@ -82,7 +83,7 @@ func WithHttpClient(client *http.Client) Option {
 // use as a corporation account
 func AsCorp() Option {
 	return func(s *Settings) error {
-		s.isCorp = true
+		s.asCorp = true
 		return nil
 	}
 }
@@ -95,6 +96,25 @@ func isValidKey(apiKey string) bool {
 	return true
 }
 
-func (c *Client) post(url string, bodyType string, body io.Reader) (*http.Response, error) {
-	return c.settings.client.Post(url, bodyType, body)
+func (c *Client) post(url string, bodyType string, body io.Reader, v interface{}) error {
+
+	resp, err := c.settings.client.Post(url, bodyType, body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		if err := json.NewDecoder(resp.Body).Decode(v); err != nil {
+			return err
+		}
+		return nil
+	} else {
+		var errorRes *CommonError
+		if err := json.NewDecoder(resp.Body).Decode(&errorRes); err != nil {
+			return err
+		}
+		e := errorRes.RequestError.PolicyException
+		return fmt.Errorf("%s: %s", e.MessageId, e.Text)
+	}
 }
